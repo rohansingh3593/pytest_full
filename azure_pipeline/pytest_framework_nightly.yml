@@ -1,0 +1,104 @@
+resources:
+  pipelines:
+  - pipeline: DI.AppServices-Nightly-RELEASE3_1
+    source: DI.AppServices-Nightly-RELEASE3_1
+    trigger:
+      branches:
+        include:
+        - refs/heads/G5R_DI_APP_SERV_REL_3_1
+
+schedules:
+- cron: "0 18 * * *"
+  displayName: Daily 6pm build
+  branches:
+    include:
+    - main
+    - releases/*
+    exclude:
+    - releases/ancient/*
+trigger: none
+pr: none
+
+jobs:
+- job: Job_1
+  displayName: Launch Pytest Framework
+  timeoutInMinutes: 300
+  workspace:
+    clean: all
+  pool:
+    name: AppServeRegression
+    demands:
+    #- kaizenbot -equals true
+    - Agent.OS -equals Linux
+    - regression -equals true
+  steps:
+  - checkout: self
+    clean: true
+    submodules: recursive
+    persistCredentials: True
+  - task: Bash@3
+    displayName: 'Bash: Delete artifacts'
+    inputs:
+      targetType: inline
+      script: >
+        set +x
+
+        ls -l $(pwd)/artifacts
+
+        rm -rf $(pwd)/artifacts
+  - task: DownloadPipelineArtifact@2
+    displayName: Download Pipeline Artifact
+    inputs:
+      source: specific
+      project: 4fc412f1-9337-4c85-8aaf-7955d066a31c
+      pipeline: 6000
+      preferTriggeringPipeline: true
+  - task: Bash@3
+    displayName: 'Bash: Regress.sh '
+    env:
+      SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+      PYTEST_DI_ARTIFACTS_2K: artifacts/bionic-x86_64/TargetDebug2K/FinalPackage
+      PYTEST_DUT_DB: kaizenbot.itron.com:5432,schema=appservschema,platform=fwdevops_kgodwin,project=appserv
+      PYTEST_MULTI_DB: kaizenbot.itron.com:5432,schema=appservschema,platform=fwdevops_kgodwin,project=appserv
+      PYTEST_TEST_PLAN_ID: 1989463
+    inputs:
+      targetType: inline
+      filePath: scripts/ru
+      script: >-
+        #!/bin/bash
+
+        ./scripts/regress.sh regress_nightly $PIPELINE_WORKSPACE/artifacts/bionic-x86_64
+  - task: Bash@3
+    displayName: 'Bash: clean_locks.py'
+    condition: always()
+    env:
+      PYTEST_DUT_DB: kaizenbot.itron.com:5432,schema=appservschema,platform=fwdevops_kgodwin,project=appserv
+      PYTEST_MULTI_DB: kaizenbot.itron.com:5432,schema=appservschema,platform=fwdevops_kgodwin,project=appserv
+    inputs:
+      targetType: inline
+      script: >
+        # Write your commands here
+
+        ps -ef | grep _work
+
+        source pytest-regress-venv/pytest-python3.8/bin/activate
+
+        ./scripts/clean_locks.py
+  - task: PublishTestResults@2
+    displayName: Publish NUnit Test Results **/TEST-*.xml
+    condition: succeededOrFailed()
+    inputs:
+      testRunner: NUnit
+      testRunTitle: Regression
+      testResultsFiles: '**/TEST-*.xml'
+  - task: PublishPipelineArtifact@1
+    displayName: Publish Pipeline Artifact
+    continueOnError: True
+    enabled: False
+    inputs:
+      path: 'output_artifacts '
+      artifactName: output_artifacts
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish Artifact: drop'
+    condition: succeededOrFailed()
+...
