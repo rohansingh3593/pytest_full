@@ -1,3 +1,1 @@
-# pytest_full
-
-add the read me file
+This is for pytest file its configuration
