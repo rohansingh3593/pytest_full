@@ -1,0 +1,88 @@
+#!/bin/bash
+
+# helper command that runs pytest with some optoins for readability
+# and ease of use
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+NC='\033[0m' # No Color
+BLUE='\033[0;34m'
+WHITE='\033[0;37m'
+YELLOW='\033[0;33m'
+
+shopt -s extglob
+# variables that user can override
+METERS="--dut-db=kaizenbot.itron.com:5432,schema=appservschema,platform=fwdevops_$USER,project=appserv"
+LOG_LEVEL=24
+EXTRA_OPTIONS='--html="report.html" --nunit-xml="TEST-results.xml"'
+CAPTURE="--show-capture=no"
+CLI_LOGFILE_NAME="full_log.log"
+DEBUG_LOG="debug_log.log"
+APPEND_LOG=false
+OUTPUT_DIR=last_run_only
+LOG_OPTIONS='--log-file-level debug
+ --lock-timeout=1h
+ --log-cli-format="%(levelname)-9s %(reltime)s (%(filename)30s:%(lineno)-3s) %(message)s"
+ --log-file-format="%(levelname)-9s %(reltime)s (%(filename)30s:%(lineno)-3s) %(message)s"
+ --log-cli-date-format="%Y-%m-%d %H:%M:%S"
+ --log-file-date-format="%Y-%m-%d %H:%M:%S"
+ --log-file '${DEBUG_LOG}
+
+USE_COLOR='--color=yes'
+EXCEPTIONS='-v --showlocals'
+
+CLI_OPTIONS=$@
+
+function run() {
+cmd="${LOG_OPTIONS}
+ ${USE_COLOR}
+ ${EXCEPTIONS}
+ ${EXTRA_OPTIONS}
+ ${SESSION_DIR}
+ ${CAPTURE}
+ ${METERS}
+ --log-cli-level $LOG_LEVEL"
+
+echo -e "${GREEN}"
+echo "pytest"
+printf "  %s" "${cmd}"
+echo -e "${YELLOW}"
+printf "  %s" "${CLI_OPTIONS}"
+echo -e "${NC}"
+all="pytest $cmd $CLI_OPTIONS"
+eval $all | tee ${CLI_LOGFILE_NAME}
+}
+
+# run user file if present to change parameters
+if [ -f $USER.sh ]; then
+	# user file should at least override the METERS option
+	source $USER.sh
+else
+	echo $USER.sh does not exist.  Defaults used
+fi
+
+
+# clean up previous run
+if [ $APPEND_LOG == false ]; then
+    rm -f $CLI_LOGFILE_NAME
+	rm -f $LOGFILE_NAME
+fi
+if [ "$OUTPUT_DIR" != "" ]; then
+	rm -rf $OUTPUT_DIR
+    SESSION_DIR="--artifact-output-dir=${OUTPUT_DIR}"
+fi
+
+# execute pytest
+run $@
+
+# remove color from logs
+if [ "$USE_COLOR" != "" ]; then
+	cat ${CLI_LOGFILE_NAME} | sed -e 's/\x1b\[[0-9;]*m//g' > $CLI_LOGFILE_NAME.nocolor
+fi
+
+echo "Log files: "
+echo "  cli history: $CLI_LOGFILE_NAME"
+if [ "$USE_COLOR" != "" ]; then
+	echo "  no color   : $CLI_LOGFILE_NAME.nocolor"
+fi
+echo "  debug log  : $DEBUG_LOG"

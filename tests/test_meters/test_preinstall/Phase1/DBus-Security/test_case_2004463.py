@@ -1,0 +1,312 @@
+
+"""
+REGENRATE: True
+Set REGENERATE to False if you modify this comment
+section to inhibit re-writing this section
+===================================================================================================
+Test Plan Path : templates/AppServ-TestRepository/Phase1
+Test Case Link : https://dev.azure.com/itron/SoftwareProducts/_workitems/edit/2004463
+===================================================================================================
+Test Case      : 2004463
+Description    : Verification of ILID values. These LIDs are read by the ContainerManager application
+Area Path      : RnD/GFW-IVV/DI Outcomes/APP-Serve
+Iteration Path : RnD/3 Week
+System.History : None
+Steps:
+===================================================================================================
+Step 1 - 
+ILID_CONTAINERS_STOP_ON_MANAGER_EXIT
+
+Step 2 - 
+eVTBool (default: True)  Flag to control if the exit of the Container Manager Daemon should stop the
+containers too. Affects SIGTERM handling.
+
+Step 3 - 
+ILID_CONTAINERS_STARTUP_DELAY_MS
+
+Step 4 - 
+eVTUnsigned32 (default: 1) Number of milliseconds to delay starting containers after the Container
+Manager Daemon has started. Does not apply if ILID_CONTAINERS_RUN_ON_STARTUP is unset or evaluates
+false.
+
+Step 5 - 
+ILID_CONTAINERS_STOP_ON_EPF
+
+Step 6 - 
+eVTBool (default: False) Flag to control if an EPF should stop the containers too.
+
+Step 7 - 
+ILID_CONTAINER_MAX_RUNTIME_PER_MILLION
+
+Step 8 - 
+eVTUnsigned32 (default: 400000)300000  Maximum number of CPU shares, out of a million, to allow
+across all containers. This value is linearly distributed across the cpu.cfs_quota_us values for
+each container, with relative weights that match the relative weights of each requested
+cpu.cfs_quota_us value.
+
+Step 9 - 
+ILID_CONTAINER_MAX_MEMORY_LIMIT_KB
+
+Step 10 - 
+eVTUnsigned32 (default: 50000 KiB) 65000 Maximum total of bytes to allow. It s a total of all cgroup
+memory limit_in_bytes. If the total across all runnable containers exceeds this number, do not start
+any.
+
+Step 11 - 
+ILID_CONTAINER_MAX_MEMORY_LIMIT_KB_OVERRIDE
+
+Step 12 - 
+eVTUnsigned32 (ASIC default: 50000, empty elsewhere)  Meter-specific override for the
+ILID_CONTAINER_MAX_MEMORY_LIMIT_KB default value. --> OBSOLETE
+
+Step 13 - 
+ILID_CONTAINER_MAX_FLASH_LIMIT_KB
+
+Step 14 - 
+eVTUnsigned32 (default: 40000)  Maximum of all flash memory exposed to containers. Do not start a
+container if its added flash would cause the total to exceed the limit.
+
+Step 15 - 
+ILID_CONTAINER_MAX_FLASH_LIMIT_KB_OVERRIDE
+
+Step 16 - 
+eVTUnsigned32 (ASIC default: 40000, empty elsewhere)  Meter-specific override for the
+ILID_CONTAINER_MAX_FLASH_LIMIT_KB default value. --> OBSOLETE
+
+Step 17 - 
+ILID_CONTAINER_STARTING_USERID
+
+Step 18 - 
+eVTUnsigned32 (default: 100000)  First userid to begin assigning to containers.
+
+Step 19 - 
+ILID_CONTAINER_ENDING_USERID
+
+Step 20 - 
+eVTUnsigned32 (default: 199999)  Last userid to allow to be assigned to containers.
+
+Step 21 - 
+ILID_CONTAINER_STARTING_GROUPID
+
+Step 22 - 
+eVTUnsigned32 (default: 100000)  First groupid to begin assigning to containers.
+
+Step 23 - 
+ILID_CONTAINER_ENDING_GROUPID
+
+Step 24 - 
+eVTUnsigned32 (default: 199999)  Last groupid to allow to be assigned to containers. Inclusive.
+
+Step 25 - 
+ILID_CONTAINERS_RUN_ON_STARTUP
+
+Step 26 - 
+eVTBool (default: True)  Flag to control if containers should be starting up when the system is
+first initializing. If FALSE, then a Refresh D-Bus message would start the containers.
+
+Step 27 - 
+ILID_CONTAINERS_WATCHDOG_TIMING_MS
+
+Step 28 - 
+eVTUnsigned32 (default: 300000)  This is the period in which DI Init must send a heartbeat to the
+Container Manager watchdog. If not, the container will be restarted. This period applies to all
+containers.
+
+Step 29 - 
+ILID_CONTAINERS_WATCHDOG_RESTART_COUNT
+
+Step 30 - 
+eVTUnsigned8 (default: 3)  When this number of watchdog count is exceeded, container is shutdown.
+RAM database is updated with status as stopped because of watch dog.
+
+Step 31 - 
+ILID_CONTAINERS_WATCHDOG_RESET_PERIOD_HOUR
+
+Step 32 - 
+eVTUnsigned16 (default: 48)  This is the period in which watch dog restart count resets. This is
+meant to avoid a case where a watchdog infrequently times out and eventually stops the container.
+Instead, this allows infrequent timeouts to continue as container restart cases.
+
+Step 33 - 
+ILID_CONTAINERS_TOTAL_SHUTDOWN_PERIOD_MS
+
+Step 34 - 
+eVTUnsigned32 (default: 5000) 8000 This period is available for the daemon to close all containers
+and shut itself down. More details in StopAllContainer().
+
+Step 35 - 
+ILID_CONTAINER_LXC_LOG_LEVEL
+
+Step 36 - 
+eVTString (default: WARN)  The LXC log level to use for containers
+
+Step 37 - 
+ILID_CONTAINER_DELETE_LOG_ON_DESTROY
+
+Step 38 - 
+eVTBool (default: true)  Whether to delete the LXC log file when destroying a container
+
+
+===================================================================================================
+
+
+"""
+import pytest
+from tests.test_meters.utils import read_lid
+
+# AUTOGENERATED Test Case 2004463
+
+# @pytest.mark.skip(reason="https://dev.azure.com/itron/RnD/_workitems/edit/2940892")
+@pytest.mark.regress_nightly
+@pytest.mark.regress_smoke
+@pytest.mark.suite_id("2002265")
+@pytest.mark.test_case("2004463")
+def test_case(preinstalled_meter, logger, di_version):
+    logger.trace("Executing Test Case 2004463 - Verification of ILID values. These LIDs are read by the ContainerManager application")
+
+    logger.trace('Step 1')
+    lid="ILID_CONTAINERS_STOP_ON_MANAGER_EXIT"
+    std_out=read_lid(preinstalled_meter,logger,lid)
+
+    logger.trace('Step 2')
+    assert std_out ,"Container Manager Daemon is not going stop the containers"
+
+    if read_lid(preinstalled_meter,logger,"ILID_CONTAINERS_RUN_ON_STARTUP"):
+        logger.trace('Step 3')
+        lid="ILID_CONTAINERS_STARTUP_DELAY_MS"
+        std_out=read_lid(preinstalled_meter,logger,lid)
+
+        logger.trace('Step 4')
+        assert std_out==1 ,"Default value is not matching"
+
+    logger.trace('Step 5')
+    lid="ILID_CONTAINERS_STOP_ON_EPF"
+    std_out=read_lid(preinstalled_meter,logger,lid)
+
+    logger.trace('Step 6')
+    assert not std_out," EPF should is not going to stop the containers "
+
+    logger.trace('Step 7')
+    lid="ILID_CONTAINER_MAX_RUNTIME_PER_MILLION"
+    std_out=read_lid(preinstalled_meter,logger,lid)
+
+
+    logger.trace('Step 8')
+    assert 30000<=std_out<=400000,'This value is not set to default'
+
+    logger.trace('Step 9')
+    lid="ILID_CONTAINER_MAX_MEMORY_LIMIT_KB"
+    std_out=read_lid(preinstalled_meter,logger,lid)
+
+
+    logger.trace('Step 10')
+    assert 50000<=std_out<=65000,'This value is not set to default'
+
+    logger.trace('Step 11')
+    lid="ILID_CONTAINER_MAX_MEMORY_LIMIT_KB_OVERRIDE"
+    std_out=read_lid(preinstalled_meter,logger,lid)
+
+    logger.trace('Step 12')
+    if isinstance(std_out,int):
+        assert std_out>=40000,'This value is not set to default'
+    else:
+        assert "marked OBSOLETE" in std_out,"This period is not set to Obsolate"
+
+
+    logger.trace('Step 13')
+    lid="ILID_CONTAINER_MAX_FLASH_LIMIT_KB"
+    std_out=read_lid(preinstalled_meter,logger,lid)
+
+    logger.trace('Step 14')
+    assert std_out==40000,'This value is not set to default'
+
+    logger.trace('Step 15')
+    lid="ILID_CONTAINER_MAX_FLASH_LIMIT_KB_OVERRIDE"
+    std_out=read_lid(preinstalled_meter,logger,lid)
+
+
+    logger.trace('Step 16')
+    if isinstance(std_out,int):
+        assert std_out==40000,'This value is not set to default'
+    else:
+        assert "marked OBSOLETE" in std_out,"This period is not set to Obsolate"
+
+    logger.trace('Step 17')
+    lid="ILID_CONTAINER_STARTING_USERID"
+    std_out=read_lid(preinstalled_meter,logger,lid)
+
+    logger.trace('Step 18')
+    assert std_out==100000,'This period is not set to default'
+
+    logger.trace('Step 19')
+    lid="ILID_CONTAINER_ENDING_USERID"
+    std_out=read_lid(preinstalled_meter,logger,lid)
+
+
+    logger.trace('Step 20')
+    assert std_out==199999,'This period is not set to default'
+
+    logger.trace('Step 21')
+    lid="ILID_CONTAINER_STARTING_GROUPID"
+    std_out=read_lid(preinstalled_meter,logger,lid)
+
+    logger.trace('Step 22')
+    assert std_out>=100000 ,'This period is not set to default'
+
+    logger.trace('Step 23')
+    lid="ILID_CONTAINER_ENDING_GROUPID"
+    std_out=read_lid(preinstalled_meter,logger,lid)
+
+    logger.trace('Step 24')
+    assert std_out<=199999,"This period is not set to default"
+
+    logger.trace('Step 25')
+    lid="ILID_CONTAINERS_RUN_ON_STARTUP"
+    std_out=read_lid(preinstalled_meter,logger,lid)
+
+
+    logger.trace('Step 26')
+    assert std_out,"Refresh D-Bus message would be start the containers"
+
+    logger.trace('Step 27')
+    lid="ILID_CONTAINERS_WATCHDOG_TIMING_MS"
+    std_out=read_lid(preinstalled_meter,logger,lid)
+
+    logger.trace('Step 28')
+    assert std_out>=300000,'Refresh D-Bus message would start the containers'
+
+    logger.trace('Step 29')
+    lid="ILID_CONTAINERS_WATCHDOG_RESTART_COUNT"
+    std_out=read_lid(preinstalled_meter,logger,lid)
+  
+
+    logger.trace('Step 30')
+    assert std_out==3,'This period is not set to default'
+
+    logger.trace('Step 31')
+    lid="ILID_CONTAINERS_WATCHDOG_RESET_PERIOD_HOUR"
+    std_out=read_lid(preinstalled_meter,logger,lid)
+
+    logger.trace('Step 32')
+    assert std_out==48,'This period is not set to default'
+
+    logger.trace('Step 33')
+    lid="ILID_CONTAINERS_TOTAL_SHUTDOWN_PERIOD_MS"
+    std_out=read_lid(preinstalled_meter,logger,lid)
+
+
+    logger.trace('Step 34')
+    assert 5000<=std_out<=8000,"This period is not set to default"
+
+    logger.trace('Step 35')
+    lid="ILID_CONTAINER_LXC_LOG_LEVEL"
+    std_out=read_lid(preinstalled_meter,logger,lid)
+    logger.trace('Step 36')
+    assert "Warn" in std_out,"The LXC log level is not use for containers"
+
+    logger.trace('Step 37')
+    lid="ILID_CONTAINER_DELETE_LOG_ON_DESTROY"
+    std_out=read_lid(preinstalled_meter,logger,lid)
+
+    logger.trace('Step 38')
+    assert std_out , " It is not going to delete the lXC file when destroying a Container"
